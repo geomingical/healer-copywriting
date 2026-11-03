@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>文案剪接台</title>
+<style>
+:root{--bg:#faf8f5;--fg:#2b2622;--muted:#7a706a;--card:#fff;--line:#e4ddd5;--soft:#f3ece2;--accent:#9a5b3c;--warn:#b5462b;--a:#c0577a;--b:#3d7a8a;--c:#7a8a3d}
+@media (prefers-color-scheme:dark){:root{--bg:#1d1a18;--fg:#ece6df;--muted:#a59a92;--card:#272320;--line:#3b3531;--soft:#33291f;--accent:#e0a07c;--warn:#ff8a6a;--a:#e98aa8;--b:#7fc0cf;--c:#bfcf7f}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.7 -apple-system,"PingFang TC","Noto Sans TC",sans-serif}
+main{max-width:1500px;margin:0 auto;padding:20px 16px 60px}
+h1{font-size:22px;margin:0}
+.intro{color:var(--muted);margin:4px 0 14px;max-width:900px}
+.nav{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.nav button{background:var(--card);color:var(--fg);border:1px solid var(--line)}
+.nav button.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+.nav button.done::after{content:" ✓"}
+button{font:inherit;padding:6px 14px;border-radius:8px;border:0;background:var(--accent);color:#fff;cursor:pointer}
+button.ghost{background:transparent;color:var(--accent);border:1px solid var(--line);padding:2px 10px}
+.head h2{font-size:19px;margin:0}.head p{margin:2px 0;color:var(--muted);font-size:14px}
+.photos{display:flex;gap:8px;overflow-x:auto;padding:8px 0}
+.photos img{height:180px;border-radius:6px;flex:none}
+.work{display:grid;grid-template-columns:repeat(3,minmax(0,1fr)) minmax(0,1.2fr);gap:12px;align-items:start}
+@media (max-width:1100px){.work{grid-template-columns:1fr 1fr}}
+@media (max-width:640px){.work{grid-template-columns:1fr}}
+.col{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.col h3{margin:0 0 6px;font-size:16px}
+.col.A h3{color:var(--a)}.col.B h3{color:var(--b)}.col.C h3{color:var(--c)}
+.line{display:flex;gap:6px;align-items:flex-start;padding:4px 6px;border-radius:6px;cursor:pointer}
+.line:hover{background:var(--soft)}
+.line .plus{color:var(--muted);flex:none;width:1.2em}
+.line.used{opacity:.45}
+.addall{margin-top:6px}
+.draft{position:sticky;top:10px;border:2px solid var(--accent)}
+.draft h3{color:var(--accent)}
+.row{display:flex;gap:4px;align-items:center;margin:3px 0}
+.tag{flex:none;font-size:11px;font-weight:700;width:1.4em;text-align:center;border-radius:4px;color:#fff}
+.tag.A{background:var(--a)}.tag.B{background:var(--b)}.tag.C{background:var(--c)}.tag.N{background:var(--muted)}
+.row input{flex:1;min-width:0;font:inherit;padding:3px 6px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--fg)}
+.row input.br{border-color:var(--warn)}
+.row .mini{background:transparent;color:var(--muted);padding:0 5px;border:0;font-size:14px}
+.mat{color:var(--muted);font-size:14px;margin:6px 0 0}
+.stats{font-size:13px;color:var(--muted);margin:6px 0}
+.warn{color:var(--warn);font-size:13px}
+.tools{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.br{color:var(--warn)}
+details{margin-top:14px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:8px 12px}
+summary{cursor:pointer;color:var(--accent)}
+pre{white-space:pre-wrap;font:inherit;margin:6px 0}
+.refs{display:grid;grid-template-columns:1fr 1fr;gap:12px}@media (max-width:640px){.refs{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<main>
+<h1>文案剪接台</h1>
+<p class="intro">左邊三欄是同一件商品的三種寫法。點任一行，就會加進右邊的「我的文案」；可以直接改字、上下移動、刪掉。紅框的 <span class="br">[方括號]</span> 是照片證明不了的句子，請確認或改寫後再拿掉括號。材質行會自動接在最後。你的草稿只存在這台電腦的瀏覽器裡。</p>
+<div class="nav" id="nav"></div>
+<div id="app"></div>
+</main>
+<script>
+const DATA = /*DATA*/null;
+const KEY = 'healer-editor-v1:';
+let current = 0;
+
+function load(id){try{return JSON.parse(localStorage.getItem(KEY+id))||null}catch(e){return null}}
+function save(id,rows){try{localStorage.setItem(KEY+id,JSON.stringify(rows))}catch(e){}}
+function el(tag,props={},...kids){const n=document.createElement(tag);for(const[k,v]of Object.entries(props)){if(k==='class')n.className=v;else if(k.startsWith('on'))n.addEventListener(k.slice(2),v);else n[k]=v}for(const k of kids)n.append(k);return n}
+const hasBracket=t=>/\[[^\]]*\]/.test(t);
+
+function nav(){
+  const box=document.getElementById('nav');box.replaceChildren();
+  DATA.products.forEach((p,i)=>{
+    const rows=load(p.id);
+    const b=el('button',{textContent:p.name.replace(/^HEALER( Made)?\s*/,'').slice(0,14),onclick:()=>{current=i;render()}});
+    if(i===current)b.classList.add('on');if(rows&&rows.length)b.classList.add('done');box.append(b);
+  });
+}
+
+function render(){
+  nav();
+  const p=DATA.products[current];
+  let rows=load(p.id)||[];
+  const app=document.getElementById('app');app.replaceChildren();
+  app.append(el('div',{class:'head'},el('h2',{textContent:p.name}),
+    el('p',{textContent:`官方色名：${p.colors.join('、')}　｜　${p.material}`})));
+  const ph=el('div',{class:'photos'});p.photos.forEach(s=>ph.append(el('img',{src:s,alt:'商品照'})));app.append(ph);
+
+  const work=el('div',{class:'work'});
+  const used=new Set(rows.map(r=>r.text));
+  const commit=()=>{save(p.id,rows);render()};
+  for(const[k,label]of Object.entries(DATA.routes)){
+    const col=el('div',{class:'col '+k},el('h3',{textContent:`路線 ${k}｜${label}`}));
+    p.routes[k].forEach(t=>{
+      const line=el('div',{class:'line'+(used.has(t)?' used':''),title:'點一下加入我的文案',onclick:()=>{rows.push({text:t,from:k});commit()}},
+        el('span',{class:'plus',textContent:'＋'}),el('span',{class:hasBracket(t)?'br':'',textContent:t}));
+      col.append(line);
+    });
+    col.append(el('div',{class:'addall'},el('button',{class:'ghost',textContent:'整篇用這版',onclick:()=>{rows=p.routes[k].map(t=>({text:t,from:k}));commit()}})));
+    work.append(col);
+  }
+
+  const draft=el('div',{class:'col draft'},el('h3',{textContent:'我的文案'}));
+  if(!rows.length)draft.append(el('p',{class:'stats',textContent:'還沒有內容：點左邊任一行，或按「整篇用這版」。'}));
+  rows.forEach((r,i)=>{
+    const input=el('input',{type:'text',value:r.text,class:hasBracket(r.text)?'br':'',oninput:e=>{r.text=e.target.value;e.target.className=hasBracket(r.text)?'br':'';save(p.id,rows);stats()}});
+    const move=(d)=>{const j=i+d;if(j<0||j>=rows.length)return;[rows[i],rows[j]]=[rows[j],rows[i]];commit()};
+    draft.append(el('div',{class:'row'},el('span',{class:'tag '+(r.from||'N'),textContent:r.from||'＋'}),input,
+      el('button',{class:'mini',textContent:'↑',title:'上移',onclick:()=>move(-1)}),
+      el('button',{class:'mini',textContent:'↓',title:'下移',onclick:()=>move(1)}),
+      el('button',{class:'mini',textContent:'✕',title:'刪除',onclick:()=>{rows.splice(i,1);commit()}})));
+  });
+  draft.append(el('p',{class:'mat',textContent:p.material}));
+  const st=el('div',{class:'stats'}),warn=el('div',{class:'warn'});draft.append(st,warn);
+  function stats(){
+    const lines=rows.map(r=>r.text.trim()).filter(Boolean);
+    const chars=lines.join('').replace(/\s/g,'').length;
+    st.textContent=`${chars} 字、${lines.length} 行（官網中位數約 118 字、9 行）`;
+    const n=lines.filter(hasBracket).length;warn.textContent=n?`還有 ${n} 行有方括號，請確認後拿掉括號。`:'';
+  }
+  stats();
+  const msg=el('span',{class:'stats'});
+  draft.append(el('div',{class:'tools'},
+    el('button',{textContent:'複製文案',onclick:async()=>{
+      const text=rows.map(r=>r.text.trim()).filter(Boolean).concat(p.material).join('\n');
+      try{await navigator.clipboard.writeText(text);msg.textContent='已複製'}catch(e){msg.textContent='無法自動複製，請手動選取'}
+    }}),
+    el('button',{class:'ghost',textContent:'＋ 空白行',onclick:()=>{rows.push({text:'',from:''});commit()}}),
+    el('button',{class:'ghost',textContent:'清空',onclick:()=>{rows=[];commit()}}),msg));
+  work.append(draft);app.append(work);
+
+  if(p.real||p.single){
+    const refs=el('div',{class:'refs'});
+    if(p.single)refs.append(el('div',{},el('strong',{textContent:'第四輪（單一版本）'}),el('pre',{textContent:p.single})));
+    if(p.real)refs.append(el('div',{},el('strong',{textContent:'官網真實文案'}),el('pre',{textContent:p.real})));
+    app.append(el('details',{},el('summary',{textContent:'對照：第四輪單一版本、官網真實文案（先自己剪完再打開比較準）'}),refs));
+  }
+}
+render();
+</script>
+</body>
+</html>

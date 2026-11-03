@@ -1,0 +1,478 @@
+<title>Healer 文案工作室</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=LXGW+WenKai+TC:wght@400;700&family=Noto+Sans+TC:wght@400;500;700&display=swap">
+<style>
+/* Layout: left = product sheet (photos + notes), right = three route columns feeding one draft; training ledger below. */
+:root{
+  --bg:#f6f5f2; --panel:#ffffff; --ink:#26242a; --muted:#6f6a73; --line:#e3e0e6; --soft:#efedf2;
+  --accent:#6b4c7a; --accent-ink:#ffffff; --warn:#b23a48; --ok:#3f7a5a;
+  --a:#b0577f; --b:#2f7486; --c:#6a7a2c;
+  --display:"LXGW WenKai TC","Kaiti TC","STKaiti",serif;
+  --body:"Noto Sans TC",-apple-system,"PingFang TC","Microsoft JhengHei",sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#1b1a1e; --panel:#24232a; --ink:#ebe8ef; --muted:#a39ea8; --line:#38353f; --soft:#2d2b33;
+  --accent:#c3a2d3; --accent-ink:#1b1a1e; --warn:#ff8090; --ok:#7cc79c;
+  --a:#e591b5; --b:#79c3d4; --c:#b9cb73; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#1b1a1e; --panel:#24232a; --ink:#ebe8ef; --muted:#a39ea8; --line:#38353f; --soft:#2d2b33;
+  --accent:#c3a2d3; --accent-ink:#1b1a1e; --warn:#ff8090; --ok:#7cc79c;
+  --a:#e591b5; --b:#79c3d4; --c:#b9cb73; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:15px/1.7 var(--body)}
+main{max-width:1440px;margin:0 auto;padding-block:20px 64px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:20px}
+h1{font:700 28px/1.2 var(--display);margin:0;letter-spacing:.02em}
+h2{font:700 19px/1.3 var(--display);margin:0}
+h3{font:700 16px/1.3 var(--body);margin:0}
+.lede{color:var(--muted);margin:4px 0 0;max-width:62ch}
+.top{display:flex;flex-wrap:wrap;gap:12px 24px;align-items:end;justify-content:space-between}
+.memory{display:flex;gap:8px;flex-wrap:wrap}
+.pill{font-size:13px;padding:2px 10px;border-radius:999px;background:var(--soft);color:var(--muted);font-variant-numeric:tabular-nums}
+.pill b{color:var(--ink)}
+.studio{display:grid;grid-template-columns:minmax(0,340px) minmax(0,1fr);gap:20px;align-items:start}
+@media (max-width:980px){.studio{grid-template-columns:1fr}}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px;display:grid;gap:12px;min-width:0}
+label{display:grid;gap:4px;font-size:13px;color:var(--muted)}
+label span.hint{font-size:12px}
+input[type=text],select,textarea{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:7px 10px;width:100%;min-width:0}
+textarea{resize:vertical;min-height:72px}
+input:focus-visible,select:focus-visible,textarea:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.drop{border:1.5px dashed var(--line);border-radius:10px;padding:14px;text-align:center;color:var(--muted);cursor:pointer;display:grid;gap:8px}
+.drop.over{border-color:var(--accent);background:var(--soft)}
+.thumbs{display:grid;grid-template-columns:repeat(auto-fill,minmax(64px,1fr));gap:6px}
+.thumb{position:relative;aspect-ratio:3/4;border-radius:6px;overflow:hidden;background:var(--soft);max-width:100%}
+.thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.thumb span{position:absolute;left:3px;top:2px;font-size:11px;background:var(--panel);color:var(--ink);border-radius:4px;padding:0 4px}
+.thumb button{position:absolute;right:2px;top:2px;width:20px;height:20px;padding:0;border-radius:50%;font-size:12px;line-height:20px}
+button{font:inherit;cursor:pointer;border-radius:8px;border:1px solid transparent;padding:7px 14px;background:var(--accent);color:var(--accent-ink)}
+button.ghost{background:transparent;color:var(--accent);border-color:var(--line)}
+button.icon{background:transparent;color:var(--muted);border:0;padding:0 6px;font-size:15px;line-height:1.6}
+button:disabled{opacity:.5;cursor:not-allowed}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.status{font-size:13px;color:var(--muted);min-height:1.4em}
+.status.err{color:var(--warn)}
+.results{display:grid;gap:14px;min-width:0}
+.banner{font-size:13px;color:var(--muted);background:var(--soft);border-radius:8px;padding:6px 10px}
+.target{font-size:14px;color:var(--muted)}
+.cols{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+@media (max-width:1180px){.cols{grid-template-columns:1fr}}
+.col{border:1px solid var(--line);border-radius:10px;padding:10px;display:grid;gap:2px;align-content:start;min-width:0;background:var(--panel)}
+.col header{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:4px}
+.col.A h3{color:var(--a)}.col.B h3{color:var(--b)}.col.C h3{color:var(--c)}
+.line{display:flex;gap:4px;align-items:flex-start;padding:3px 4px;border-radius:6px}
+.line:hover{background:var(--soft)}
+.line .txt{flex:1;min-width:0;cursor:pointer;user-select:text}
+.line.used .txt{color:var(--muted)}
+.line .txt.br{color:var(--warn)}
+.line mark{background:transparent;color:var(--warn);text-decoration:line-through;font-weight:700}
+.heart{color:var(--muted)}.heart.on{color:var(--a)}
+.colfoot{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.colfoot button{font-size:13px;padding:3px 10px}
+details.det{font-size:13px;color:var(--muted)}
+details.det ul{margin:4px 0;padding-left:18px}
+.draft{border:2px solid var(--accent)}
+.drow{display:flex;gap:4px;align-items:center}
+.tag{flex:none;font-size:11px;font-weight:700;width:1.6em;text-align:center;border-radius:4px;color:var(--panel);background:var(--muted)}
+.tag.A{background:var(--a)}.tag.B{background:var(--b)}.tag.C{background:var(--c)}
+.drow input{flex:1}
+.drow input.br{border-color:var(--warn)}
+.mat{font-size:13px;color:var(--muted)}
+.tools{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.ledger{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+@media (max-width:980px){.ledger{grid-template-columns:1fr}}
+.ledger ul{list-style:none;margin:0;padding:0;display:grid;gap:4px;max-height:280px;overflow:auto}
+.ledger li{display:flex;gap:6px;align-items:flex-start;justify-content:space-between;font-size:14px;padding:3px 6px;border-radius:6px;background:var(--soft)}
+.ledger li span{min-width:0;overflow-wrap:anywhere}
+.empty{font-size:13px;color:var(--muted)}
+.inline{display:flex;gap:6px}
+.inline input{flex:1}
+.bar{display:flex;height:8px;border-radius:4px;overflow:hidden;background:var(--soft)}
+.bar i{display:block}
+.legend{display:flex;gap:10px;font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.ban-pop{position:fixed;z-index:20;font-size:13px;padding:5px 10px;box-shadow:0 4px 14px rgba(0,0,0,.18)}
+@media (prefers-reduced-motion:no-preference){.line,.thumb{transition:background .15s}}
+</style>
+
+<main>
+  <div class="top">
+    <div>
+      <h1>Healer 文案工作室</h1>
+      <p class="lede">上傳商品照、補上材質與你的試穿感受，一次寫出三種版本。點句子組成自己的文案；按 ♡ 記下喜歡的句子，反白文字可以設成「不要再出現」。這些選擇和定稿會存成團隊的訓練紀錄，下一次寫作會照著調整。</p>
+    </div>
+    <div class="memory" id="memory" aria-live="polite"></div>
+  </div>
+
+  <div class="studio">
+    <form class="panel" id="form" autocomplete="off">
+      <h2>商品資料</h2>
+      <div class="drop" id="drop" tabindex="0" role="button" aria-label="上傳商品照片">
+        <div id="dropText">點這裡或把照片拖進來（全身照＋細節照最好）</div>
+        <input type="file" id="files" accept="image/jpeg,image/png,image/webp" multiple hidden>
+        <div class="thumbs" id="thumbs"></div>
+      </div>
+      <label>商品名稱<input type="text" id="name" placeholder="例：HEALER Made 無著感高腰彈性合身褲"></label>
+      <div class="row2">
+        <label>類別<select id="category"></select></label>
+        <label>官方色名<input type="text" id="colors" placeholder="例：深藍、淺藍"></label>
+      </div>
+      <label>材質<input type="text" id="material" placeholder="例：✦材質成份：棉68%+聚酯纖維27%+彈性纖維5%"></label>
+      <label>背景資訊<span class="hint">補貨、改版、自訂款、熱銷、搭配建議……寫了才會用</span><textarea id="background" placeholder="例：去年賣到缺貨，今年加了新色；腰頭改成全鬆緊"></textarea></label>
+      <label>自身感受<span class="hint">試穿心得、身高尺寸、觸感，會直接寫進文案</span><textarea id="feeling" placeholder="例：162 公分穿 S，長度剛好到腳踝；布料軟，坐下不會勒"></textarea></label>
+      <div class="tools">
+        <button type="submit" id="go">寫三種版本</button>
+        <button type="button" class="ghost" id="stop" hidden>停止</button>
+      </div>
+      <div class="status" id="status" role="status"></div>
+    </form>
+
+    <section class="results" aria-label="寫作結果">
+      <div class="banner" id="banner"></div>
+      <div class="target" id="target"></div>
+      <div class="cols" id="cols"></div>
+      <details class="det" id="details"></details>
+      <div class="panel draft">
+        <h2>我的文案</h2>
+        <div id="draftRows" style="display:grid;gap:4px"></div>
+        <div class="mat" id="draftMat"></div>
+        <div class="status" id="draftStats"></div>
+        <div class="tools">
+          <button type="button" id="copy">複製文案</button>
+          <button type="button" class="ghost" id="saveFinal">存成定稿</button>
+          <button type="button" class="ghost" id="blank">＋ 空白行</button>
+          <button type="button" class="ghost" id="clear">清空</button>
+          <span class="status" id="draftMsg"></span>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <section class="panel" aria-label="訓練紀錄">
+    <div class="top">
+      <div>
+        <h2>訓練紀錄</h2>
+        <p class="lede">每次寫作都會帶入下面的內容。建議先累積 10 篇定稿，再看三種版本有沒有越來越接近你們的口氣。這是把紀錄放進提示裡，不是重新訓練模型；刪掉一筆，下一次就不再參考。</p>
+      </div>
+      <div style="display:grid;gap:4px;min-width:min(260px,100%)">
+        <div class="legend" id="routeLegend"></div>
+        <div class="bar" id="routeBar"></div>
+      </div>
+    </div>
+    <div class="ledger">
+      <div style="display:grid;gap:8px;align-content:start">
+        <h3>不要再出現</h3>
+        <div class="inline"><input type="text" id="banInput" placeholder="直接輸入字詞，例：水水看過來"><button type="button" class="ghost" id="banAdd">加入</button></div>
+        <ul id="banList"></ul>
+      </div>
+      <div style="display:grid;gap:8px;align-content:start">
+        <h3>喜歡的句子</h3>
+        <ul id="likeList"></ul>
+      </div>
+      <div style="display:grid;gap:8px;align-content:start">
+        <h3>定稿</h3>
+        <ul id="finalList"></ul>
+      </div>
+    </div>
+    <div class="status" id="dbStatus"></div>
+  </section>
+</main>
+<button type="button" class="ban-pop" id="banPop" hidden></button>
+
+<script>
+const DATA = /*DATA*/null;
+const ROUTES = {A:'心動開場', B:'賣點直擊', C:'穿搭情境'};
+const LIKES_SENT = 40, FINALS_SENT = 3, OPENERS = 4;
+const DRAFT_KEY = 'healer-studio-draft-v1';
+const $ = id => document.getElementById(id);
+function el(tag, props = {}, ...kids){const n=document.createElement(tag);for(const[k,v]of Object.entries(props)){if(k==='class')n.className=v;else if(k.startsWith('on'))n.addEventListener(k.slice(2),v);else n[k]=v}for(const k of kids)if(k!=null)n.append(k);return n}
+const hasBracket = t => /\[[^\]]*\]/.test(t);
+function hash(s){let h=0x811c9dc5;for(const ch of s){h^=ch.codePointAt(0);h=Math.imul(h,0x01000193)>>>0}return h.toString(16)}
+
+// ---------- state ----------
+let photos = [];          // File[]
+let result = null;        // {target, details, A, B, C, example?}
+let draft = [];           // [{text, from}]
+let meta = {name:'', category:'', colors:'', material:''};
+let banned = [], liked = [], finals = [];
+let sample = null, db = null, maxImages = 0, ctl = null;
+
+function saveLocal(){try{localStorage.setItem(DRAFT_KEY, JSON.stringify({form:readForm(), result, draft}))}catch(e){}}
+function loadLocal(){try{return JSON.parse(localStorage.getItem(DRAFT_KEY))}catch(e){return null}}
+
+// ---------- form ----------
+for (const c of DATA.categories) $('category').append(el('option',{value:c,textContent:c}));
+const FIELDS = ['name','category','colors','material','background','feeling'];
+function readForm(){return Object.fromEntries(FIELDS.map(f=>[f,$(f).value.trim()]))}
+FIELDS.forEach(f=>$(f).addEventListener('input',saveLocal));
+
+function renderThumbs(){
+  const box=$('thumbs');box.replaceChildren();
+  photos.forEach((file,i)=>{
+    const url=URL.createObjectURL(file);
+    box.append(el('div',{class:'thumb'},el('img',{src:url,alt:`照片 ${i+1}`,onload:()=>URL.revokeObjectURL(url)}),
+      el('span',{textContent:String(i+1).padStart(2,'0')}),
+      el('button',{type:'button',class:'ghost',textContent:'✕',title:'移除',onclick:e=>{e.stopPropagation();photos.splice(i,1);renderThumbs()}})));
+  });
+  const cap = maxImages ? `，最多 ${maxImages} 張` : '';
+  $('dropText').textContent = photos.length ? `已選 ${photos.length} 張${cap}（可再加入）` : `點這裡或把照片拖進來（全身照＋細節照最好${cap}）`;
+}
+function addFiles(list){
+  const ok=[...list].filter(f=>/^image\/(jpeg|png|webp)$/.test(f.type));
+  photos=photos.concat(ok);
+  if(maxImages&&photos.length>maxImages){photos=photos.slice(0,maxImages);setStatus(`一次最多 ${maxImages} 張，多的已略過。`,true)}
+  renderThumbs();
+}
+$('drop').addEventListener('click',e=>{if(e.target.tagName!=='BUTTON')$('files').click()});
+$('drop').addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();$('files').click()}});
+$('files').addEventListener('change',e=>{addFiles(e.target.files);e.target.value=''});
+['dragenter','dragover'].forEach(t=>$('drop').addEventListener(t,e=>{e.preventDefault();$('drop').classList.add('over')}));
+['dragleave','drop'].forEach(t=>$('drop').addEventListener(t,e=>{e.preventDefault();$('drop').classList.remove('over')}));
+$('drop').addEventListener('drop',e=>addFiles(e.dataTransfer.files));
+
+function setStatus(msg,err=false){$('status').textContent=msg;$('status').className='status'+(err?' err':'')}
+
+// ---------- prompt ----------
+function bigrams(t){const s=new Set();for(let i=0;i<t.length-1;i++)s.add(t.slice(i,i+2));return s}
+function core(n){return n.replace(/HEALER( Made| X \w+)?|Clina Pick！|S-XL|S\/M|[\s!！]/g,'')}
+function similarity(a,b){const x=bigrams(core(a)),y=bigrams(core(b));const u=new Set([...x,...y]);if(!u.size)return 0;let n=0;for(const v of x)if(y.has(v))n++;return n/u.size}
+const SCENE=/水水|喜歡|適合|春|夏|秋|冬|上班|通勤|約會|出遊|日常|女孩|的妳/, HOOK=/！|!|愛|太|最|很少|驚艷|厲害|爆表|紅了|挑戰|終於|回歸|久違|眼睛一亮/;
+const firsts=DATA.pool.map(p=>p.description.split('\n').map(s=>s.trim()).find(Boolean)||'');
+const sceneOpeners=firsts.filter(f=>SCENE.test(f)), hookOpeners=firsts.filter(f=>HOOK.test(f)&&!SCENE.test(f));
+function pick(arr,n){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a.slice(0,n)}
+
+function buildPrompt(f){
+  let cands=DATA.pool.filter(p=>p.category===f.category);
+  if(cands.length<3)cands=DATA.pool;
+  const examples=[...cands].sort((a,b)=>similarity(f.name,b.name)-similarity(f.name,a.name)||a.id.localeCompare(b.id)).slice(0,3);
+  const ex=examples.map((p,i)=>`### 範例 ${i+1}：${p.name}\n材質：${p.material}\n官網商品資訊：\n${p.description}`).join('\n\n');
+  const likes=liked.slice(0,LIKES_SENT).map(l=>`- ${l.text}`).join('\n')||'（還沒有）';
+  const bans=banned.map(b=>`- ${b.phrase}`).join('\n')||'（還沒有）';
+  const fins=finals.slice(0,FINALS_SENT).map((x,i)=>`### 定稿 ${i+1}：${x.name}（${x.category}）\n${x.lines.map(l=>l.text).join('\n')}`).join('\n\n')||'（還沒有）';
+  return `${DATA.rules}
+
+**使用者補充的資訊：** 下方「背景資訊」「自身感受」是使用者親口提供的，可以直接用 Healer 語氣寫進文案，不必加方括號；但不能延伸出使用者沒說的內容。自身感受要寫成小編口吻（例如「小編162穿S剛好」），不要整段照抄。
+
+${DATA.style}
+
+# 新商品
+商品名稱：${f.name}
+類別：${f.category}
+官方色名：${f.colors||'（未提供）'}
+材質：${f.material||'（未提供）'}
+照片：隨訊息附上的 ${photos.length} 張圖片，依上傳順序編號 01 到 ${String(photos.length).padStart(2,'0')}
+
+# 使用者補充
+背景資訊：${f.background||'（無）'}
+自身感受：${f.feeling||'（無）'}
+
+# 團隊訓練紀錄（優先於上面的一般規則）
+## 絕對不要出現的字詞（任何版本都不能用，換別的說法）
+${bans}
+
+## 團隊喜歡的句子（學它們的口氣與角度，不要照抄、不要沿用其中的商品事實）
+${likes}
+
+## 團隊最近的定稿（最貼近團隊想要的成品，學結構與節奏）
+${fins}
+
+# 同店其他商品的真實文案（只學語氣與結構，不可沿用它們的商品事實）
+${ex}
+
+# 本商品的開頭參考（官網其他商品的真實第一行，只學口氣與角度）
+路線 A：${pick(hookOpeners,OPENERS).join(' ／ ')}
+路線 C：${pick(sceneOpeners,OPENERS).join(' ／ ')}
+
+# 輸出格式
+只回一個 JSON 物件，不要其他文字：
+{"target":"一句話說明本商品是照片中的哪一件","details":["細節（照片編號）"],"A":["路線A 第一行","第二行"],"B":["..."],"C":["..."]}
+A、B、C 每個元素是一行文案。`;
+}
+
+// ---------- generate ----------
+const ERR={not_granted:'沒有允許這個頁面使用 Claude，所以無法寫作。',sampling_disabled:'這個帳號目前不能從頁面使用 Claude。',
+  rate_limited:'使用量到上限或呼叫太頻繁，請稍後再試。',session_expired:'登入已過期，請重新登入 claude.ai。',
+  image_rejected:'有照片無法讀取或太大，請換一張。',images_unavailable:'這個檢視不能傳送照片給 Claude。',
+  refused:'Claude 拒絕了這次的內容，請調整後再試。',invalid_json:'回覆格式不完整，請再按一次。',prompt_too_large:'資料太長，請減少照片或補充文字。'};
+$('form').addEventListener('submit',async e=>{
+  e.preventDefault();
+  const f=readForm();
+  if(!sample){setStatus('要在 claude.ai 上登入並開啟這個頁面，才能寫作。',true);return}
+  if(!photos.length){setStatus('請先上傳至少一張商品照。',true);return}
+  if(!f.name){setStatus('請填商品名稱。',true);$('name').focus();return}
+  ctl=new AbortController();
+  $('go').disabled=true;$('stop').hidden=false;
+  setStatus(`正在看 ${photos.length} 張照片並寫三種版本，通常要 1 到 2 分鐘……`);
+  try{
+    const out=await sample.json(buildPrompt(f),{images:photos,modelTier:'complex',cache:false,signal:ctl.signal});
+    const lines=k=>Array.isArray(out?.[k])?out[k].map(s=>String(s).trim()).filter(Boolean):[];
+    if(!lines('A').length||!lines('B').length||!lines('C').length)throw{code:'invalid_json'};
+    result={target:String(out.target||''),details:Array.isArray(out.details)?out.details.map(String):[],A:lines('A'),B:lines('B'),C:lines('C')};
+    meta={name:f.name,category:f.category,colors:f.colors,material:f.material};
+    draft=[];setStatus('完成。點句子加入右下的「我的文案」。');
+    saveLocal();renderResult();renderDraft();
+  }catch(err){
+    if(err?.code!=='cancelled')setStatus(ERR[err?.code]||'連線中斷，請再按一次。',true);else setStatus('已停止。');
+  }finally{$('go').disabled=false;$('stop').hidden=true}
+});
+$('stop').addEventListener('click',()=>ctl?.abort());
+
+// ---------- results ----------
+function bannedIn(text){return banned.map(b=>b.phrase).filter(p=>p&&text.includes(p))}
+function markBanned(text){
+  const hits=bannedIn(text);const span=el('span');
+  if(!hits.length){span.textContent=text;return span}
+  const re=new RegExp('('+hits.map(h=>h.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')).join('|')+')','g');
+  text.split(re).forEach((part,i)=>span.append(i%2?el('mark',{textContent:part,title:'這是「不要再出現」的字詞'}):part));
+  return span;
+}
+function renderResult(){
+  const r=result||{...DATA.example,example:true};
+  const m=result?meta:{name:DATA.example.name,category:DATA.example.category,colors:DATA.example.colors,material:DATA.example.material};
+  $('banner').textContent=result?`${m.name}　｜　${m.category}${m.colors?'　｜　'+m.colors:''}`:`範例：${m.name}（第五輪試寫的真實輸出）。上傳你的商品照後，這裡會換成你的結果。`;
+  $('target').textContent=r.target?`認出的商品：${r.target}`:'';
+  const cols=$('cols');cols.replaceChildren();
+  const used=new Set(draft.map(d=>d.text));
+  const likedSet=new Set(liked.map(l=>l.text));
+  for(const[k,label]of Object.entries(ROUTES)){
+    const col=el('div',{class:'col '+k},el('header',{},el('h3',{textContent:`${k}｜${label}`})));
+    let warn=0;
+    r[k].forEach(t=>{
+      if(bannedIn(t).length)warn++;
+      const txt=el('span',{class:'txt'+(hasBracket(t)?' br':''),title:'點一下加入我的文案；反白文字可設成不要再出現',onclick:()=>{if(String(getSelection()).trim())return;draft.push({text:t,from:k});afterDraft()}});
+      txt.append(markBanned(t));
+      txt.dataset.route=k;
+      const on=likedSet.has(t);
+      col.append(el('div',{class:'line'+(used.has(t)?' used':'')},txt,
+        el('button',{type:'button',class:'icon heart'+(on?' on':''),textContent:on?'♥':'♡',title:on?'取消喜歡':'喜歡這句',ariaLabel:on?'取消喜歡':'喜歡這句',onclick:()=>toggleLike(t,k)})));
+    });
+    col.append(el('div',{class:'colfoot'},
+      el('button',{type:'button',class:'ghost',textContent:'整篇用這版',onclick:()=>{draft=r[k].map(t=>({text:t,from:k}));afterDraft()}}),
+      el('button',{type:'button',class:'ghost',textContent:'整版都喜歡',onclick:()=>likeAll(r[k],k)})));
+    if(warn)col.append(el('div',{class:'status err',textContent:`有 ${warn} 行用了「不要再出現」的字詞`}));
+    cols.append(col);
+  }
+  const det=$('details');det.replaceChildren();
+  if(r.details?.length){det.append(el('summary',{textContent:`Claude 從照片看到的細節（${r.details.length} 項）`}),el('ul',{},...r.details.map(d=>el('li',{textContent:d}))));det.hidden=false}else det.hidden=true;
+}
+
+// ---------- draft ----------
+function afterDraft(){saveLocal();renderDraft();renderResult()}
+function renderDraft(){
+  const box=$('draftRows');box.replaceChildren();
+  const mat=result?meta.material:DATA.example.material;
+  if(!draft.length)box.append(el('p',{class:'empty',textContent:'點上面任一行加入，或按「整篇用這版」。'}));
+  draft.forEach((r,i)=>{
+    const input=el('input',{type:'text',value:r.text,id:`draft-${i}`,ariaLabel:`第 ${i+1} 行`,className:hasBracket(r.text)?'br':'',
+      oninput:e=>{r.text=e.target.value;e.target.className=hasBracket(r.text)?'br':'';saveLocal();stats()}});
+    const move=d=>{const j=i+d;if(j<0||j>=draft.length)return;[draft[i],draft[j]]=[draft[j],draft[i]];afterDraft()};
+    box.append(el('div',{class:'drow'},el('span',{class:'tag '+(r.from||''),textContent:r.from||'＋'}),input,
+      el('button',{type:'button',class:'icon',textContent:'↑',title:'上移',ariaLabel:'上移',onclick:()=>move(-1)}),
+      el('button',{type:'button',class:'icon',textContent:'↓',title:'下移',ariaLabel:'下移',onclick:()=>move(1)}),
+      el('button',{type:'button',class:'icon',textContent:'✕',title:'刪除',ariaLabel:'刪除',onclick:()=>{draft.splice(i,1);afterDraft()}})));
+  });
+  $('draftMat').textContent=mat||'';
+  stats();
+}
+function stats(){
+  const lines=draft.map(r=>r.text.trim()).filter(Boolean);
+  const chars=lines.join('').replace(/\s/g,'').length;
+  const br=lines.filter(hasBracket).length, bn=lines.filter(l=>bannedIn(l).length).length;
+  let msg=`${chars} 字、${lines.length} 行（官網中位數約 118 字、9 行）`;
+  if(br)msg+=`；還有 ${br} 行有 [方括號]，確認後請拿掉括號`;
+  if(bn)msg+=`；${bn} 行有不要再出現的字詞`;
+  $('draftStats').textContent=msg;$('draftStats').className='status'+(br||bn?' err':'');
+}
+function draftText(){const mat=result?meta.material:DATA.example.material;return draft.map(r=>r.text.trim()).filter(Boolean).concat(mat?[mat]:[]).join('\n')}
+$('copy').addEventListener('click',async()=>{try{await navigator.clipboard.writeText(draftText());$('draftMsg').textContent='已複製'}catch(e){$('draftMsg').textContent='無法自動複製，請手動選取每一行'}});
+$('blank').addEventListener('click',()=>{draft.push({text:'',from:''});afterDraft();$(`draft-${draft.length-1}`)?.focus()});
+$('clear').addEventListener('click',()=>{draft=[];afterDraft()});
+$('saveFinal').addEventListener('click',async()=>{
+  const lines=draft.map(r=>({text:r.text.trim(),from:r.from||''})).filter(l=>l.text);
+  if(!lines.length){$('draftMsg').textContent='先組好文案再存。';return}
+  if(lines.some(l=>hasBracket(l.text))){$('draftMsg').textContent='還有 [方括號] 沒確認，確認後再存成定稿。';return}
+  if(!result){$('draftMsg').textContent='範例不能存成定稿，請先寫你的商品。';return}
+  if(!db){$('draftMsg').textContent='訓練紀錄目前無法連線，定稿沒有存。';return}
+  try{await db.collection('finals').add({name:meta.name,category:meta.category,lines,material:meta.material||'',at:Date.now()});$('draftMsg').textContent='已存成定稿，下次寫作會參考。'}
+  catch(e){$('draftMsg').textContent=e?.code==='quota_exceeded'?'訓練紀錄已滿，請刪掉一些舊定稿。':'沒有存成功（你可能只有檢視權限）。'}
+});
+
+// ---------- training memory ----------
+async function toggleLike(text,route){
+  if(!db){setStatus('訓練紀錄目前無法連線。',true);return}
+  const ref=db.collection('liked').doc('l'+hash(text));
+  try{if(liked.some(l=>l.text===text))await ref.delete();else await ref.set({text,route,at:Date.now()})}catch(e){setStatus('沒有存成功（你可能只有檢視權限）。',true)}
+}
+async function likeAll(lines,route){
+  if(!db){setStatus('訓練紀錄目前無法連線。',true);return}
+  const have=new Set(liked.map(l=>l.text));
+  try{for(const t of lines)if(!have.has(t)&&!hasBracket(t))await db.collection('liked').doc('l'+hash(t)).set({text:t,route,at:Date.now()});setStatus(`已把路線 ${route} 的句子記為喜歡（方括號句除外）。`)}
+  catch(e){setStatus('沒有存成功（你可能只有檢視權限）。',true)}
+}
+async function addBan(phrase){
+  phrase=phrase.trim();if(!phrase)return;
+  if(!db){setStatus('訓練紀錄目前無法連線。',true);return}
+  if(phrase.length>40){setStatus('「不要再出現」請只選幾個字的詞或短句。',true);return}
+  try{await db.collection('banned').doc('b'+hash(phrase)).set({phrase,at:Date.now()});setStatus(`之後不會再用「${phrase}」。`)}catch(e){setStatus('沒有存成功（你可能只有檢視權限）。',true)}
+}
+$('banAdd').addEventListener('click',()=>{addBan($('banInput').value);$('banInput').value=''});
+$('banInput').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();$('banAdd').click()}});
+
+// selection inside a route line -> "不要再出現" button
+const pop=$('banPop');let popText='';
+function updatePop(){
+  const sel=getSelection();const t=String(sel).trim();
+  const node=sel.anchorNode&&(sel.anchorNode.nodeType===1?sel.anchorNode:sel.anchorNode.parentElement);
+  if(!t||t.length>40||!node?.closest('.col .txt')){pop.hidden=true;return}
+  const rect=sel.getRangeAt(0).getBoundingClientRect();
+  popText=t;pop.textContent=`不要再出現「${t}」`;pop.hidden=false;
+  pop.style.left=Math.max(8,Math.min(innerWidth-pop.offsetWidth-8,rect.left))+'px';
+  pop.style.top=Math.max(8,rect.top-pop.offsetHeight-8)+'px';
+}
+document.addEventListener('selectionchange',()=>requestAnimationFrame(updatePop));
+pop.addEventListener('mousedown',e=>e.preventDefault());
+pop.addEventListener('click',()=>{addBan(popText);pop.hidden=true;getSelection().removeAllRanges()});
+
+function renderMemory(){
+  $('memory').replaceChildren(
+    el('span',{class:'pill'},el('b',{textContent:String(banned.length)}),' 個不要再出現'),
+    el('span',{class:'pill'},el('b',{textContent:String(liked.length)}),' 句喜歡'),
+    el('span',{class:'pill'},el('b',{textContent:String(finals.length)}),' / 10 篇定稿'));
+  const list=(id,items,label,del)=>{const ul=$(id);ul.replaceChildren();if(!items.length){ul.append(el('li',{},el('span',{class:'empty',textContent:label})));return}
+    items.forEach(it=>ul.append(el('li',{},el('span',{textContent:it.label}),el('button',{type:'button',class:'icon',textContent:'✕',title:'刪除',ariaLabel:'刪除',onclick:()=>del(it)}))))};
+  const rm=(coll,id)=>db?.collection(coll).doc(id).delete().catch(()=>setStatus('沒有刪除成功。',true));
+  list('banList',banned.map(b=>({label:b.phrase,id:b.id})),'還沒有。反白結果裡的字詞，或在上面輸入。',it=>rm('banned',it.id));
+  list('likeList',liked.map(l=>({label:`${l.route?l.route+'｜':''}${l.text}`,id:l.id})),'還沒有。按結果旁的 ♡。',it=>rm('liked',it.id));
+  list('finalList',finals.map(f=>({label:`${f.name}：${f.lines.map(l=>l.text).join(' ／ ')}`,id:f.id})),'還沒有。組好文案後按「存成定稿」。',it=>rm('finals',it.id));
+  const count={A:0,B:0,C:0,'':0};finals.forEach(f=>f.lines.forEach(l=>count[l.from in count?l.from:'']++));
+  const total=Object.values(count).reduce((a,b)=>a+b,0);
+  const colors={A:'var(--a)',B:'var(--b)',C:'var(--c)','':'var(--muted)'};
+  $('routeBar').replaceChildren(...Object.entries(count).filter(([,n])=>n).map(([k,n])=>el('i',{style:`width:${n/total*100}%;background:${colors[k]}`})));
+  $('routeLegend').replaceChildren(...(total?Object.entries(count).filter(([,n])=>n).map(([k,n])=>el('span',{textContent:`${k?k+' '+ROUTES[k]:'自己寫'} ${Math.round(n/total*100)}%`})):[el('span',{textContent:'定稿裡各路線句子的比例會顯示在這裡'})]));
+}
+
+// ---------- boot ----------
+const saved=loadLocal();
+if(saved){FIELDS.forEach(f=>{if(saved.form?.[f]!=null)$(f).value=saved.form[f]});result=saved.result||null;draft=Array.isArray(saved.draft)?saved.draft:[];
+  if(result&&saved.form)meta={name:saved.form.name,category:saved.form.category,colors:saved.form.colors,material:saved.form.material}}
+renderThumbs();renderResult();renderDraft();renderMemory();
+
+(async()=>{
+  sample=await window.claude?.use('sample')??null;
+  if(!sample){setStatus('要在 claude.ai 上登入並開啟這個頁面，才能寫作。',true);$('go').disabled=true}
+  else{const lim=await sample.limits().catch(()=>null);maxImages=lim?.images?.maxCount||0;
+    if(!lim?.images){setStatus('這個檢視不能傳送照片給 Claude，所以暫時無法寫作。',true);$('go').disabled=true}
+    renderThumbs()}
+})();
+(async()=>{
+  db=await window.claude?.use('db')??null;
+  if(!db){$('dbStatus').textContent='訓練紀錄需要登入 claude.ai 才能讀寫。';return}
+  const timer=setTimeout(()=>{$('dbStatus').textContent='訓練紀錄還連不上，顯示的可能不是最新。'},10000);
+  const watch=(coll,assign)=>db.collection(coll).orderBy('at','desc').limit(300).onSnapshot(s=>{
+    if(!s.metadata.fromCache){clearTimeout(timer);$('dbStatus').textContent=''}
+    assign(s.docs.map(d=>({id:d.id,...d.data()})));renderMemory();renderResult();stats()},
+    ()=>{clearTimeout(timer);$('dbStatus').textContent='訓練紀錄連線中斷，請重新整理頁面。'});
+  watch('banned',v=>banned=v.filter(b=>typeof b.phrase==='string'));
+  watch('liked',v=>liked=v.filter(l=>typeof l.text==='string'));
+  watch('finals',v=>finals=v.filter(f=>Array.isArray(f.lines)));
+})();
+</script>
