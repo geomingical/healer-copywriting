@@ -1,0 +1,94 @@
+{
+ "hearts": [
+  {
+   "text": "有史以來最熱賣的針織版型",
+   "route": "A",
+   "product_id": "base-knit-vneck",
+   "added": "2026-11-03"
+  },
+  {
+   "text": "這次直接做成現在最紅的疊穿感！",
+   "route": "A",
+   "product_id": "base-knit-vneck",
+   "added": "2026-11-03"
+  },
+  {
+   "text": "假兩件一次到位 不用自己再疊",
+   "route": "A",
+   "product_id": "base-knit-vneck",
+   "added": "2026-11-03"
+  },
+  {
+   "text": "針織完全親膚 穿起來超級舒服",
+   "route": "A",
+   "product_id": "base-knit-vneck",
+   "added": "2026-11-03"
+  },
+  {
+   "text": "咖色溫柔 深灰很俐落",
+   "route": "A",
+   "product_id": "base-knit-vneck",
+   "added": "2026-11-03"
+  },
+  {
+   "text": "兩色都想收的那種",
+   "route": "A",
+   "product_id": "base-knit-vneck",
+   "added": "2026-11-03"
+  },
+  {
+   "text": "淺色內層從領口袖口下擺露出",
+   "route": "A",
+   "product_id": "base-knit-vneck",
+   "added": "2026-11-03"
+  },
+  {
+   "text": "V領讓脖子看起來更修長",
+   "route": "B",
+   "product_id": "base-knit-vneck",
+   "added": "2026-11-03"
+  },
+  {
+   "text": "落肩寬鬆版 不會卡手臂",
+   "route": "B",
+   "product_id": "base-knit-vneck",
+   "added": "2026-11-03"
+  },
+  {
+   "text": "配上小包和平底鞋 上班也合適！",
+   "route": "C",
+   "product_id": "base-knit-vneck",
+   "added": "2026-11-03"
+  }
+ ],
+ "banned": [],
+ "finals": [
+  {
+   "product_id": "base-knit-vneck",
+   "name": " HEALER Made疊穿天天針織 假兩件式V領針織毛衣",
+   "text": "有史以來最熱賣的針織版型\n這次直接做成現在最紅的疊穿感！\n假兩件一次到位 不用自己再疊\n淺色內層從領口袖口下擺露出\nV領讓脖子看起來更修長\n針織完全親膚 穿起來超級舒服\n落肩寬鬆版 不會卡手臂\n咖色溫柔 深灰很俐落\n兩色都想收的那種\n配上小包和平底鞋 上班也合適！\n47%尼龍+23%壓克力+20%聚酯纖維+5%羊毛+5%蠶絲",
+   "saved": "2026-11-03"
+  }
+ ],
+ "disliked": [
+  {
+   "text": "下擺兩側有開衩更好活動",
+   "route": "B",
+   "product_id": "base-knit-vneck",
+   "added": "2026-11-03"
+  },
+  {
+   "text": "[早晚溫差大 單穿就很剛好]",
+   "route": "C",
+   "product_id": "base-knit-vneck",
+   "added": "2026-11-03"
+  }
+ ],
+ "style_notes": [
+  {
+   "note": "文字再口語一點，像小編跟朋友聊天",
+   "source": "使用者聊天回饋",
+   "added": "2026-11-03"
+  }
+ ]
+}
