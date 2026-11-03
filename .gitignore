@@ -1,5 +1,26 @@
 .DS_Store
 work/
+runs/
 *.tmp
+*.lock
 *.err
 __pycache__/
+node_modules/
+
+# 部署設定與金鑰（不要 commit）
+.vercel/
+.vercel
+panel/.vercel
+supabase/.temp/
+panel/supabase/.temp/
+.env
+.env.*
+*.env
+panel.env
+
+# 由 panel/build.mjs 產生（範本是 panel/public/config.example.js）
+panel/public/config.js
+
+# 暫存輸出
+/tmp/
+tmp/
