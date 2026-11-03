@@ -1,0 +1,10 @@
+.vercel
+.vercel/
+node_modules/
+.env
+.env.*
+*.env
+panel.env
+supabase/.temp/
+# 由 build.mjs 依 PANEL_API_URL 產生，每個部署各自不同；範本見 public/config.example.js
+public/config.js

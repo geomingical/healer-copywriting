@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<meta name="color-scheme" content="light dark">
+<title>Healer 文案面板</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="/style.css">
+<script src="/config.js"></script>
+<script src="/core.js" defer></script>
+<script src="/product.js" defer></script>
+<script src="/app.js" defer></script>
+</head>
+<body>
+<header class="top">
+  <h1>Healer 文案面板</h1>
+  <p id="save-status" class="save-status" aria-live="polite"></p>
+</header>
+
+<div id="banner" class="banner" role="alert" hidden>
+  <span id="banner-text"></span>
+  <button id="banner-retry" type="button" class="btn small">重試</button>
+</div>
+
+<main id="app">
+  <section id="view-loading" class="view">
+    <p class="muted center">載入中…</p>
+  </section>
+
+  <section id="view-missing" class="view" hidden>
+    <div class="card notice">
+      <h2 id="missing-title">找不到這個專案連結</h2>
+      <p id="missing-text">連結可能打錯或已經過期。請回到聊天室跟小編要新的專案連結。</p>
+    </div>
+  </section>
+
+  <!-- 專案首頁 -->
+  <section id="view-home" class="view" hidden>
+    <div class="home-head">
+      <h2>這期專案</h2>
+      <p id="project-title" class="muted"></p>
+    </div>
+    <p class="hint">每個商品各自上傳照片、填資料。填好的商品勾起來，可以一次送出好幾個。</p>
+    <ul id="product-list" class="plist" aria-label="商品列表"></ul>
+    <p id="product-empty" class="muted center" hidden>還沒有商品，按下面「＋新增商品」開始。</p>
+    <button id="add-product" type="button" class="btn big wide add">＋新增商品</button>
+
+    <div class="card end-box">
+      <h3>結束這期專案</h3>
+      <p class="hint">全部商品都處理完後再結束。結束後網址會變成唯讀，小編會學習你修改後的文案。</p>
+      <button id="close-project" type="button" class="btn danger">結束這期專案</button>
+    </div>
+
+    <div class="dock">
+      <div id="home-missing" class="missing" aria-live="polite"></div>
+      <button id="submit-selected" type="button" class="btn primary big wide">送出選取的商品（0）</button>
+    </div>
+  </section>
+
+  <!-- 唯讀總覽 -->
+  <section id="view-closed" class="view" hidden>
+    <div class="home-head">
+      <h2>這期專案已結束</h2>
+      <p id="closed-meta" class="muted"></p>
+    </div>
+    <p class="hint">這個網址現在是唯讀的，可以複製每個商品的文案。</p>
+    <ul id="closed-list" class="clist" aria-label="商品文案"></ul>
+  </section>
+
+  <!-- 商品畫面 -->
+  <section id="view-product" class="view" hidden>
+    <div class="pbar">
+      <button id="back-home" type="button" class="btn">← 回商品列表</button>
+      <p id="product-head" class="phead"></p>
+    </div>
+
+    <!-- 1. 填寫 -->
+    <div id="pane-form" class="pane" hidden>
+      <div class="card fields">
+        <label>商品編號 <span class="req">必填</span>
+          <input id="sku-input" maxlength="40" autocomplete="off" autocapitalize="off" spellcheck="false">
+        </label>
+        <p id="sku-error" class="field-error" aria-live="polite"></p>
+      </div>
+      <div class="card">
+        <h2>新品照片 <span class="req">必填</span></h2>
+        <label class="btn primary big upload">
+          <input id="file-input" type="file" accept="image/*" multiple>
+          <span aria-hidden="true">📷</span> 上傳新品照片
+        </label>
+        <p class="hint">可以拍照或從相簿選，一次選多張。最多 20 張。</p>
+        <ul id="photo-list" class="photos" aria-label="已上傳的照片"></ul>
+      </div>
+
+      <form id="fields-form" class="card fields" novalidate>
+        <label>商品名稱 <span class="req">必填</span>
+          <input name="name" maxlength="120" autocomplete="off" placeholder="例如：馬賽小鎮 V領抓皺短洋裝">
+        </label>
+        <label>類別 <span class="req">必填</span>
+          <select name="category"><option value="">請選擇</option></select>
+        </label>
+        <div class="label">色名 <span class="req">必填，可多個</span>
+          <div id="color-tags" class="tags" aria-label="已加入的色名"></div>
+          <div class="row">
+            <input id="color-input" autocomplete="off" placeholder="輸入色名，按 Enter 或「加入」" aria-label="色名">
+            <button id="color-add" type="button" class="btn">加入</button>
+          </div>
+        </div>
+        <label>材質 <span class="req">必填</span>
+          <input name="material" maxlength="1000" autocomplete="off" placeholder="✦材質成分：100%棉">
+        </label>
+        <label>尺寸 <span class="opt">選填</span>
+          <textarea name="sizes" rows="2" maxlength="1000" placeholder="例如：S／M／L，或尺寸表重點"></textarea>
+        </label>
+        <label>價格 <span class="opt">選填</span>
+          <input name="price" maxlength="1000" inputmode="text" autocomplete="off" placeholder="例如：1280">
+        </label>
+        <label>背景資訊 <span class="opt">選填</span>
+          <textarea name="background" rows="3" maxlength="1000" placeholder="補貨、改版、熱銷……"></textarea>
+        </label>
+        <label>自身感受 <span class="opt">選填</span>
+          <textarea name="feelings" rows="3" maxlength="1000" placeholder="試穿心得、身高尺寸、觸感……"></textarea>
+        </label>
+      </form>
+      <div class="center">
+        <button id="delete-product" type="button" class="btn danger-text">刪除這個草稿商品</button>
+      </div>
+      <div class="dock">
+        <p id="form-missing" class="missing" aria-live="polite"></p>
+        <button id="submit-btn" type="button" class="btn primary big wide">送出這個商品</button>
+      </div>
+    </div>
+
+    <!-- 2. 等待 -->
+    <div id="pane-wait" class="pane" hidden>
+      <div class="card notice center">
+        <div class="spinner" aria-hidden="true"></div>
+        <h2 id="wait-title">小編正在寫文案</h2>
+        <p>通常需要幾分鐘，這頁可以關掉，之後再用同一個連結回來。也可以先回商品列表處理其他商品。</p>
+        <p class="muted">已等待 <span id="wait-time">0 秒</span></p>
+      </div>
+    </div>
+
+    <!-- 3. 挑句子 / 4. 定稿 -->
+    <div id="pane-pick" class="pane" hidden>
+      <div id="final-box" hidden>
+        <div class="card final">
+          <h2>✅ 已定稿</h2>
+          <pre id="final-text" class="final-text"></pre>
+          <div class="row">
+            <button id="final-copy" type="button" class="btn primary">複製文案</button>
+            <button id="final-edit" type="button" class="btn">回去修改</button>
+          </div>
+        </div>
+        <div class="card edited">
+          <h2><label for="edited-text">我修改後的最終文案</label></h2>
+          <textarea id="edited-text" rows="6" maxlength="5000" placeholder="把你實際使用、修改後的版本貼在這裡，結束專案後小編會學習你的文字偏好"></textarea>
+          <p id="edited-status" class="hint" aria-live="polite"></p>
+          <div class="row">
+            <button id="edited-seed" type="button" class="btn">用定稿全文當起點</button>
+            <button id="edited-copy" type="button" class="btn">複製</button>
+          </div>
+        </div>
+      </div>
+      <div id="pick-area">
+        <p id="summary" class="muted summary"></p>
+        <div class="tabs" role="tablist" aria-label="三種版本">
+          <button type="button" role="tab" class="tab" data-route="A" aria-selected="true">A 心動開場 <span class="count"></span></button>
+          <button type="button" role="tab" class="tab" data-route="B" aria-selected="false">B 賣點直擊 <span class="count"></span></button>
+          <button type="button" role="tab" class="tab" data-route="C" aria-selected="false">C 穿搭情境 <span class="count"></span></button>
+        </div>
+        <p class="hint">按 ♡ 把句子加進「我的文案」，按 ✕ 表示不喜歡（之後不會再出現）。</p>
+        <ul id="cards" class="cards" role="tabpanel"></ul>
+        <details id="hidden-box" class="hidden-box">
+          <summary id="hidden-summary">已隱藏 0 句（可復原）</summary>
+          <ul id="hidden-list" class="hidden-list"></ul>
+        </details>
+      </div>
+      <button id="fab" type="button" class="fab" aria-haspopup="dialog">我的文案 (0)</button>
+    </div>
+  </section>
+</main>
+
+<!-- 我的文案（底部面板） -->
+<div id="sheet-backdrop" class="backdrop" hidden></div>
+<section id="sheet" class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title" hidden>
+  <div class="sheet-head">
+    <h2 id="sheet-title">我的文案</h2>
+    <button id="sheet-close" type="button" class="btn icon" aria-label="關閉">✕</button>
+  </div>
+  <div class="sheet-body">
+    <p id="draft-empty" class="muted">還沒有句子。回到上面按 ♡ 加入。</p>
+    <ol id="draft-list" class="draft"></ol>
+    <label class="check-row"><input id="material-toggle" type="checkbox" checked> 最後加上材質行</label>
+    <p id="material-line" class="material"></p>
+    <div class="banned">
+      <h3>禁用詞</h3>
+      <p class="hint">含有禁用詞的句子會自動隱藏，也會記成團隊的喜好。</p>
+      <div id="banned-tags" class="tags" aria-label="禁用詞"></div>
+      <div class="row">
+        <input id="banned-input" autocomplete="off" placeholder="例如：超級" aria-label="新增禁用詞">
+        <button id="banned-add" type="button" class="btn">加入</button>
+      </div>
+    </div>
+  </div>
+  <div class="sheet-foot row">
+    <button id="copy-btn" type="button" class="btn">複製文案</button>
+    <button id="finalize-btn" type="button" class="btn primary">定稿</button>
+  </div>
+</section>
+
+<!-- 新增商品 -->
+<dialog id="add-dialog" class="confirm" aria-labelledby="add-title">
+  <form id="add-form" method="dialog" novalidate>
+    <h2 id="add-title">新增商品</h2>
+    <label class="fields-label">商品編號
+      <input id="add-sku" maxlength="40" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="例如：DR-2405">
+    </label>
+    <p class="hint">英文、數字、中文或 - _ . ，不能有空白或斜線，最多 40 字。</p>
+    <p id="add-error" class="field-error" aria-live="polite"></p>
+    <div class="row">
+      <button id="add-cancel" type="button" class="btn">取消</button>
+      <button id="add-ok" type="submit" class="btn primary">新增</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- 共用確認對話框 -->
+<dialog id="confirm" class="confirm" aria-labelledby="confirm-title">
+  <h2 id="confirm-title"></h2>
+  <p id="confirm-body"></p>
+  <p id="confirm-extra" class="confirm-extra"></p>
+  <div class="row">
+    <button id="confirm-no" type="button" class="btn">再想想</button>
+    <button id="confirm-yes" type="button" class="btn primary"></button>
+  </div>
+</dialog>
+
+<div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+</body>
+</html>
