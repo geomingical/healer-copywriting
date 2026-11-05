@@ -127,11 +127,13 @@ class Client:
     def __init__(self, api: str, key: str):
         self.api, self.key = api, key
 
+    def headers(self) -> dict[str, str]:
+        """Request headers; a subclass without a bot key (the public /p/<token> API) overrides this."""
+        return {'x-bot-key': self.key, 'content-type': 'application/json', 'accept': 'application/json'}
+
     def call(self, method: str, path: str, body=None):
         data = None if body is None else json.dumps(body, ensure_ascii=False).encode('utf-8')
-        req = urllib.request.Request(self.api + path, data=data, method=method,
-                                     headers={'x-bot-key': self.key, 'content-type': 'application/json',
-                                              'accept': 'application/json'})
+        req = urllib.request.Request(self.api + path, data=data, method=method, headers=self.headers())
         try:
             with urllib.request.urlopen(req, timeout=TIMEOUT) as res:
                 raw = res.read()
